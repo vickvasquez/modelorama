@@ -5,7 +5,7 @@
   "dependencies": {
     "is-my-json-valid": "^2.17.2",
     "json-schema-faker": "^0.5.0-rc13",
-    "json-schema-sequelizer": "^0.14.3",
+    "json-schema-sequelizer": "^0.14.4",
     "lodash": "^4.17.5",
     "wargs": "^0.8.1"
   },
