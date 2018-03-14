@@ -20,7 +20,7 @@ fs
   .forEach(file => {
     const name = path.basename(file, '.json');
     const $schema = require(path.join(__dirname, 'schemas', name));
-    const functions = path.join(__dirname, '/../api/models', `${name}.js`);
+    const functions = path.join(__dirname, `../api/models/${name}.js`);
     const definition = fs.existsSync(functions)
       ? require(functions)
       : {};
