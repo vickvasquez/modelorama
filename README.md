@@ -33,4 +33,4 @@ src
 2. Generate  migrations from schema differences `bin/db migrate --make`
 3. Save a snapshot from the whole schema `bin/db migrate --apply "optional description"`
 
-Every time you change something on your models you MUST repeat the steps 2 and 3, preferrably doing fewer changes at once.
+Every time you change something on your `schemas` you MUST repeat the steps 2 and 3, preferably doing fewer changes at once.
