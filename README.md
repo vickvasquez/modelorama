@@ -1,4 +1,4 @@
-## How it works?
+## Features
 
 - JSON-Schema is used to generate samples for seeds, fixtures, etc.
 - Sequelize models are described by JSON-Schema.
@@ -27,15 +27,10 @@ src
 5 directories, 7 files
 ```
 
-## Migrations
+## Usage
 
-```bash
-$ bin/migrate make
-$ bin/migrate apply
-$ bin/migrate create
-$ bin/migrate destroy
-$ bin/migrate up
-$ bin/migrate down
-$ bin/migrate next
-$ bin/migrate prev
-```
+1. Add your model definitions as `.json` files
+2. Generate  migrations from schema differences `bin/db migrate --make`
+3. Save a snapshot from the whole schema `bin/db migrate --apply "optional description"`
+
+Every time you change something on your models you MUST repeat the steps 2 and 3, preferrably doing fewer changes at once.
