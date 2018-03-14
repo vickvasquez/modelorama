@@ -1,0 +1,10 @@
+{
+  "properties": {
+    "qty": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "qty"
+  ]
+}
