@@ -7,7 +7,6 @@
 
 const argv = require('wargs')(process.argv.slice(2));
 const cmd = argv._.shift();
-const $ = argv.flags;
 
 const USAGE_INFO = `
 Perform database changes
@@ -42,16 +41,47 @@ Examples:
   bin/db backup --save path/to/seeds --only Product,Cart
 `;
 
-const logger = {
-  error: console.error.bind(console),
-  message: console.log.bind(console),
+const options = {
+  migrations: argv._.slice(),
+  options: argv.flags,
 };
 
-if (cmd === 'migrate') {
-  require('json-schema-sequelizer/cli/migrate')($, require('../src/models'), logger);
-} else if (cmd === 'backup') {
-  require('json-schema-sequelizer/cli/backup')($, require('../src/models'), logger);
-} else {
-  logger.message(USAGE_INFO);
-  process.exit(1);
+const cli = require('json-schema-sequelizer/cli');
+
+let _error;
+let _conn;
+
+function db(cb) {
+  if (cmd === 'migrate' || cmd === 'backup') {
+    return cb(require('../src/models'));
+  }
 }
+
+Promise.resolve()
+  .then(() => db(x => x.connect()))
+  .then(() => {
+    if (cmd === 'migrate') {
+      return db(x => cli.migrate(x, options));
+    }
+
+    if (cmd === 'backup') {
+      return db(x => cli.backup(x, options));
+    }
+
+    process.stderr.write(`${USAGE_INFO}\n`);
+    process.exit(1);
+  })
+  .catch(e => {
+    process.stderr.write(`${e.stack}\n`);
+    _error = true;
+  })
+  .then(() => db(x => x.close()))
+  .catch(e => {
+    process.stderr.write(`${e.stack}\n`);
+    _error = true;
+  })
+  .then(() => {
+    if (_error) {
+      process.exit(1);
+    }
+  });
