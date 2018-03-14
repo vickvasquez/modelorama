@@ -1,0 +1,57 @@
+#!/bin/sh
+
+':' // ; exec "$(command -v nodejs || command -v node)" "$0" "$@"
+; // eslint-disable-line semi-style
+
+'use strict';
+
+const argv = require('wargs')(process.argv.slice(2));
+const cmd = argv._.shift();
+const $ = argv.flags;
+
+const USAGE_INFO = `
+Perform database changes
+
+  --only       Optional. Filter out specific models
+
+  migrate
+
+    --make     Optional. Take an snapshot from your models
+    --apply    Optional. Save changes from executed migrations
+
+    --create   Optional. Create database from your schema
+    --destroy  Optional. Drop the database entirely
+
+    --up       Optional. Apply all pending migrations
+    --down     Optional. Revert all applied migrations
+    --next     Optional. Apply the latest pending migration
+    --prev     Optional. Revert the latest applied migration
+
+    --from     Optional. Apply migrations from this offset
+    --to       Optional. Apply migrations up to this offset
+
+  backup
+
+    --import   Optional. Load into the database, directory or file
+    --export   Optional. Save backup to destination, directory
+
+Examples:
+  bin/db migrate --make
+  bin/db migrate --apply "migration description"
+  bin/db backup --load ../from/backup/or/path/to/seeds
+  bin/db backup --save path/to/seeds --only Product,Cart
+`;
+
+const logger = {
+  error: console.error.bind(console),
+  message: console.log.bind(console),
+};
+
+if (cmd === 'migrate') {
+  require('json-schema-sequelizer/cli/migrate')($, require('../src/models'), logger);
+} else if (cmd === 'backup') {
+  require('json-schema-sequelizer/cli/backup')($, require('../src/models'), logger);
+} else {
+  logger.message(USAGE_INFO);
+  process.exit(1);
+}
