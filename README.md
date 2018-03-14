@@ -1,9 +1,3 @@
-## Features
-
-- JSON-Schema is used to generate samples for seeds, fixtures, etc.
-- Sequelize models are described by JSON-Schema.
-- Database migrations are granted for free.
-
 ## Overview
 
 ```bash
@@ -26,6 +20,12 @@ src
 
 5 directories, 7 files
 ```
+
+## Features
+
+- JSON-Schema is used to generate samples for seeds, fixtures, etc.
+- Sequelize models are described by JSON-Schema.
+- Database migrations are granted for free.
 
 ## Usage
 
