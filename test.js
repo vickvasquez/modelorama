@@ -3,9 +3,9 @@
 const assert = require('assert');
 
 const models = require('./src/models');
-const $schema = require('./src/models/schema');
+const schemas = require('./src/models/schema');
 
-const exampleProduct = $schema.Product.fake();
+const exampleProduct = schemas.Product.fake();
 
 Promise.resolve()
   .then(() => models.connect())
