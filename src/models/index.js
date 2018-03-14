@@ -14,12 +14,6 @@ const db = new JSONSchemaSequelizer(config.use_env_variable
   ? process.env[config.use_env_variable]
   : config, refs);
 
-db.connect()
-  .catch(e => {
-    console.error(e.stack);
-    process.exit(1);
-  });
-
 fs
   .readdirSync(path.join(__dirname, 'schemas'))
   .filter(file => file.indexOf('.json') !== -1)
