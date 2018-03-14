@@ -1,0 +1,10 @@
+{
+  "definitions": {
+    "primaryKey": {
+      "type": "integer",
+      "minimum": 0,
+      "primaryKey": true,
+      "autoIncrement": true
+    }
+  }
+}
