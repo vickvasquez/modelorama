@@ -31,7 +31,9 @@ db.connect()
       if (req.params.keys[0]) {
         req.params.action = req.params.action || 'show';
       } else {
-        req.params.action = req.method === 'GET' ? 'index' : 'create';
+        req.params.action = req.method === 'GET'
+          ? (req.params.action || 'index')
+          : 'create';
       }
 
       if (req.params.action === 'edit' && req.method === 'POST') {
@@ -54,7 +56,10 @@ db.connect()
 
           return !action
             ? `/db/${modelName}`
-            : `/db/${modelName}/${action === 'new' ? action : `${action}/:${_pk}`}`;
+            : `/db/${modelName}/${action === 'new'
+            ? action
+            : `:${_pk}/${action === 'edit' ? action : ''}`.replace(/\/$/, '')
+          }`;
         },
         resource: Model ? JSONSchemaSequelizer.resource(db.$refs, db.models, {
           attachments: Model ? dbHook.buildAttachments(Model, __dirname, 'tmp') : [],
@@ -78,7 +83,7 @@ db.connect()
 
             res.send([
               `<html><head><link rel="stylesheet" href="/jsonschema-form-mw/styles.css"/></head>`,
-              `<body><script type="application/json" data-component="jsonschema-form">${JSON.stringify(data)}</script>`,
+              `<body><script type="application/json" data-component="jsonschema-form">${JSON.stringify(data, null, 2)}</script>`,
               `<script src="/jsonschema-form-mw/main.js"></script></body></html>`,
             ].join(''));
             return;
