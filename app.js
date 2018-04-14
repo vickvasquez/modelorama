@@ -52,13 +52,14 @@ db.connect()
 
       const opts = {
         url(modelName, action) {
-          const _pk = db.models[modelName].primaryKeyAttribute;
+          const _pks = db.models[modelName].primaryKeys;
+          const _path = Object.keys(_pks).map(k => `:${k}`).join('/');
 
           return !action
             ? `/db/${modelName}`
             : `/db/${modelName}/${action === 'new'
             ? action
-            : `:${_pk}/${action === 'edit' ? action : ''}`.replace(/\/$/, '')
+            : `${_path}/${action === 'edit' ? action : ''}`.replace(/\/$/, '')
           }`;
         },
         resource: Model ? JSONSchemaSequelizer.resource(db.$refs, db.models, {
