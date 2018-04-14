@@ -36,7 +36,7 @@ db.connect()
           : 'create';
       }
 
-      if (req.params.action === 'edit' && req.method === 'POST') {
+      if (req.params.action === 'show' && req.method === 'POST') {
         req.params.action = req.body._method === 'DELETE' ? 'destroy' : 'update';
       }
 
@@ -53,7 +53,7 @@ db.connect()
       const opts = {
         url(modelName, action) {
           const _pks = db.models[modelName].primaryKeys;
-          const _path = Object.keys(_pks).map(k => `:${k}`).join('/');
+          const _path = Object.keys(_pks).sort().map(k => `:${k}`).join('/');
 
           return !action
             ? `/db/${modelName}`
@@ -64,8 +64,8 @@ db.connect()
         },
         resource: Model ? JSONSchemaSequelizer.resource(db.$refs, db.models, {
           attachments: Model ? dbHook.buildAttachments(Model, __dirname, 'tmp') : [],
-          payload: req.body.payload,
-          where: req.body.where,
+          payload: req.body.payload || req.query.payload,
+          where: req.body.where || req.query.where,
           keys: req.params.keys,
         }, Model.name) : undefined,
         action: req.params.action,
