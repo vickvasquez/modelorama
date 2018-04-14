@@ -1,8 +1,5 @@
 {
   "title": "New gift!",
-  "id": {
-    "ui:widget": "hidden"
-  },
   "qty": {
     "ui:title": "Quantity",
     "ui:widget": "updown",
