@@ -6,6 +6,7 @@
     "ui:autofocus": true
   },
   "cart_id": {
+    "ui:xdisabled": true,
     "ui:template": [
       ["small", "total: {items.CartItem.qty!0}"],
       ["span", "{id} - {@val:items.*.name}"]
