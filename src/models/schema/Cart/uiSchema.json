@@ -10,5 +10,18 @@
       ["span", "{Product.name}"],
       ["span", "({qty})"]
     ]
-  }
+  },
+  "ui:fields": [
+    {
+      "prop": "id",
+      "title": "Cart ID"
+    },
+    {
+      "title": "Products",
+      "template": [
+        ["small", "total: {@sum:items.*.CartItem.qty}"],
+        ["span", "{@val:items.*.name}"]
+      ]
+    }
+  ]
 }

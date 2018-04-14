@@ -1,0 +1,6 @@
+{
+  "findAll": [
+    "items.name",
+    "items.price"
+  ]
+}
