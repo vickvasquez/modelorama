@@ -12,14 +12,41 @@ db.connect()
     app.use('/jsonschema-form-mw', require('serve-static')(dbHook.publicDir));
     app.use(require('body-parser').json());
 
-    app.all('/db/:model?/:action?/:id?', (req, res) => {
+    app.all(/^\/db(\/.+?)?$/, (req, res) => {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
       res.setHeader('Access-Control-Allow-Origin', '*');
+
+      const parts = (req.params[0] || '/').substr(1).split('/');
+
+      if (parts[0]) {
+        req.params.model = parts.shift();
+      }
+
+      if (/^[a-z]+$/.test(parts[parts.length - 1])) {
+        req.params.action = parts.pop();
+      }
+
+      req.params.keys = parts.filter(Boolean);
+
+      if (req.params.keys[0]) {
+        req.params.action = req.params.action || 'show';
+      } else {
+        req.params.action = req.method === 'GET' ? 'index' : 'create';
+      }
+
+      if (req.params.action === 'edit' && req.method === 'POST') {
+        req.params.action = req.body._method === 'DELETE' ? 'destroy' : 'update';
+      }
 
       const isJSON = /application\/.*json/.test(req.headers.accept);
 
       const Model = db.models[req.params.model];
       const pk = Model && Model.primaryKeyAttribute;
+
+      if (req.method === 'OPTIONS') {
+        res.end();
+        return;
+      }
 
       const opts = {
         url(modelName, action) {
@@ -29,15 +56,13 @@ db.connect()
             ? `/db/${modelName}`
             : `/db/${modelName}/${action === 'new' ? action : `${action}/:${_pk}`}`;
         },
-        method: req.body._method || req.method,
-        resource: Model ? JSONSchemaSequelizer.resource(db.$refs, db.models, Model.name, {
+        resource: Model ? JSONSchemaSequelizer.resource(db.$refs, db.models, {
           attachments: Model ? dbHook.buildAttachments(Model, __dirname, 'tmp') : [],
           payload: req.body.payload,
           where: req.body.where,
-          key: req.params[pk],
-        }) : undefined,
+          keys: req.params.keys,
+        }, Model.name) : undefined,
         action: req.params.action,
-        fieldId: req.params.id,
         modelName: req.params.model,
         modelNames: Object.keys(db.models),
         modelInstance: Model,
