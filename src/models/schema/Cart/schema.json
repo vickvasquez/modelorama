@@ -9,8 +9,5 @@
         "through": "CartItem"
       }
     }
-  },
-  "required": [
-    "items"
-  ]
+  }
 }

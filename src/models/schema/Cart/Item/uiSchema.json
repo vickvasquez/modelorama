@@ -5,6 +5,12 @@
     "ui:widget": "updown",
     "ui:autofocus": true
   },
+  "cart_id": {
+    "ui:template": [
+      ["small", "total: {items.CartItem.qty!0}"],
+      ["span", "{id} - {@val:items.*.name}"]
+    ]
+  },
   "product_id": {
     "ui:template": [
       ["small", "${price}"],
