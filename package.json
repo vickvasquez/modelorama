@@ -2,6 +2,12 @@
   "name": "models-example",
   "version": "0.1.0",
   "private": true,
+  "main": "app.js",
+  "scripts": {
+    "start": "node .",
+    "build": "npm run build:protobuf",
+    "build:protobuf": "protobuf-jsonschema src/models/protobuf/*.proto > src/models/definitions/protoTypes.json"
+  },
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
@@ -14,6 +20,7 @@
     "wargs": "^0.8.1"
   },
   "devDependencies": {
+    "protobuf-jsonschema": "^1.1.1",
     "sqlite3": "^4.0.0"
   }
 }
