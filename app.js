@@ -67,6 +67,7 @@ db.connect()
           payload: req.body.payload || req.query.payload,
           where: req.body.where || req.query.where,
           keys: req.params.keys,
+          raw: true,
         }, Model.name) : undefined,
         action: req.params.action,
         modelName: req.params.model,
@@ -95,12 +96,12 @@ db.connect()
         .catch(e => {
           if (isJSON) {
             res.json({
-              result: e,
+              result: e.stack || e,
             });
             return;
           }
 
-          res.send(e.toString());
+          res.send(e.stack || e);
         });
     });
 
