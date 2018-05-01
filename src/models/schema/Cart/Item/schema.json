@@ -1,5 +1,8 @@
 {
   "properties": {
+    "id": {
+      "$ref": "dataTypes#/definitions/primaryKey"
+    },
     "qty": {
       "type": "integer"
     }

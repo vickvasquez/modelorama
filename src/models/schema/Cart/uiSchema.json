@@ -19,8 +19,8 @@
     {
       "title": "Products",
       "template": [
-        ["small", "total: {@sum:items.*.CartItem.qty}"],
-        ["span", "{@val:items.*.name}"]
+        ["small", "total: {@sum:items.*.qty}"],
+        ["span", "{@val:items.*.Product.name}"]
       ]
     }
   ]

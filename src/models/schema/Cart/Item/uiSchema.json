@@ -1,21 +1,43 @@
 {
   "title": "New gift!",
+  "id": {
+    "ui:widget": "hidden"
+  },
   "qty": {
     "ui:title": "Quantity",
     "ui:widget": "updown",
     "ui:autofocus": true
   },
-  "cart_id": {
+  "CartId": {
     "ui:xdisabled": true,
     "ui:template": [
       ["small", "total: {items.CartItem.qty!0}"],
       ["span", "{id} - {@val:items.*.name}"]
     ]
   },
-  "product_id": {
+  "ProductId": {
     "ui:template": [
       ["small", "${price}"],
       ["span", "{name}"]
     ]
-  }
+  },
+  "ui:fields": [
+    {
+      "prop": "qty",
+      "title": "Quantity"
+    },
+    {
+      "prop": "CartId",
+      "title": "Cart ID"
+    },
+    {
+      "prop": "ProductId",
+      "title": "Product ID"
+    }
+  ],
+  "ui:order": [
+    "ProductId",
+    "CartId",
+    "*"
+  ]
 }
