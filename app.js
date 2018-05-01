@@ -115,3 +115,7 @@ db.connect()
     console.log(error);
     process.exit(1);
   });
+
+process.on('exit', () => {
+  db.close();
+});
