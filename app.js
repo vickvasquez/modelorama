@@ -16,6 +16,13 @@ db.connect()
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
       res.setHeader('Access-Control-Allow-Origin', '*');
 
+      let isJSON = /application\/.*json/.test(req.headers.accept);
+
+      if (req.params[0] && /\.json$/.test(req.params[0])) {
+        req.params[0] = req.params[0].replace('.json', '');
+        isJSON = true;
+      }
+
       const parts = (req.params[0] || '/').substr(1).split('/');
 
       if (parts[0]) {
@@ -39,8 +46,6 @@ db.connect()
       if (req.params.action === 'show' && req.method === 'POST') {
         req.params.action = req.body._method === 'DELETE' ? 'destroy' : 'update';
       }
-
-      const isJSON = /application\/.*json/.test(req.headers.accept);
 
       const Model = db.models[req.params.model];
       const pk = Model && Model.primaryKeyAttribute;
