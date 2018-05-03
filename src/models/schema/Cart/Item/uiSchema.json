@@ -12,7 +12,7 @@
     "ui:xdisabled": true,
     "ui:template": [
       ["small", "total: {items.CartItem.qty!0}"],
-      ["span", "{id} - {@val:items.*.name}"]
+      ["span", "{id} - {@uniq:items.*.name}"]
     ]
   },
   "ProductId": {

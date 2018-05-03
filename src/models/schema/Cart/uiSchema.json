@@ -6,9 +6,9 @@
   "items": {
     "ui:title": "Gift list",
     "ui:template": [
-      ["small", "${Product.price!0.00}"],
-      ["span", "{Product.name!N/A}"],
-      ["span", "({qty})"]
+      ["small", " ... ${@mul:qty,Product.price}"],
+      ["small", "{qty} × ${Product.price!0.00}"],
+      ["span", "{Product.name!N/A}"]
     ]
   },
   "ui:fields": [
@@ -19,8 +19,9 @@
     {
       "title": "Products",
       "template": [
-        ["small", "total: {@sum:items.*.qty}"],
-        ["span", "{@val:items.*.Product.name}"]
+        ["small", "${@mul:items.*.qty,items.*.Product.price}"],
+        ["small", "items: {@sum:items.*.qty}"],
+        ["span", "{@uniq:items.*.Product.name}"]
       ]
     }
   ]
