@@ -2,8 +2,8 @@
 
 const assert = require('assert');
 
-const models = require('./src/models');
-const schemas = require('./src/models/schema');
+const models = require('./src/schema/models');
+const schemas = require('./src/schema');
 
 const exampleProduct = schemas.Product.fake();
 
@@ -24,8 +24,8 @@ Promise.resolve()
         assert(results.length === 1);
         assert(results[0].code === exampleProduct.code);
         assert(results[0].name === exampleProduct.name);
-        assert(results[0].price === exampleProduct.price);
-        assert(results[0].CartItem.qty === 3);
+        assert(results[0].price == exampleProduct.price)
+        assert(results[0].CartItem.qty == 3);
       })
       .then(() => cart.removeItem(product))
       .then(() => cart.countItems())
@@ -34,5 +34,6 @@ Promise.resolve()
       });
   })
   .catch(e => {
-    console.error(e);
-  });
+    console.error(e.stack);
+  })
+  .then(() => models.close());

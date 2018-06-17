@@ -4,7 +4,7 @@ const JSONSchemaSequelizer = require('json-schema-sequelizer');
 const validator = require('is-my-json-valid');
 const jsf = require('json-schema-faker');
 const _ = require('lodash');
-const db = require('.');
+const db = require('./models');
 
 const refs = {};
 const schemas = {};
