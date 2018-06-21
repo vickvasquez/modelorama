@@ -1,6 +1,5 @@
 'use strict';
 
-const JSONSchemaSequelizer = require('json-schema-sequelizer');
 const validator = require('is-my-json-valid');
 const jsf = require('json-schema-faker');
 const _ = require('lodash');
@@ -15,7 +14,7 @@ const defaults = {
   alwaysFakeOptionals: false,
 };
 
-function _assertFrom(schema, refs, data) {
+function _assertFrom(schema, data) {
   const validate = validator(schema, {
     schemas: refs,
     verbose: true,
@@ -41,10 +40,10 @@ function _assertFrom(schema, refs, data) {
   }
 }
 
-function _validateFrom(schema, refs, data) {
+function _validateFrom(schema, data) {
   return new Promise((resolve, reject) => {
     try {
-      _assertFrom(schema, refs, data);
+      _assertFrom(schema, data);
       resolve(data);
     } catch (e) {
       reject(e);
@@ -52,7 +51,7 @@ function _validateFrom(schema, refs, data) {
   });
 }
 
-function _fakeAll(schema, refs, opts) {
+function _fakeAll(schema, opts) {
   jsf.option(_.merge(opts, defaults));
 
   return jsf({
@@ -62,20 +61,20 @@ function _fakeAll(schema, refs, opts) {
   }, refs);
 }
 
-function _fake(schema, refs, opts) {
+function _fake(schema, opts) {
   jsf.option(_.merge(opts, defaults));
 
   return jsf(schema, refs);
 }
 
 Object.keys(db.$refs).forEach(refId => {
-  refs[refId] = _.clone(db.$refs[refId].$schema);
+  refs[refId] = db.$refs[refId].$schema;
 
   schemas[refId] = {
-    fake: opts => _fake(refs[refId], refs, opts),
-    fakeAll: opts => _fakeAll(refs[refId], refs, opts),
-    assert: data => _assertFrom(refs[refId], refs, data),
-    validate: data => _validateFrom(refs[refId], refs, data),
+    fake: opts => _fake(refs[refId], opts),
+    fakeAll: opts => _fakeAll(refs[refId], opts),
+    assert: data => _assertFrom(refs[refId], data),
+    validate: data => _validateFrom(refs[refId], data),
   };
 });
 
