@@ -53,7 +53,7 @@ let _conn;
 
 function db(cb) {
   if (cmd === 'migrate' || cmd === 'backup') {
-    return cb(require('../src/models'));
+    return cb(require('../src/schema/models'));
   }
 }
 

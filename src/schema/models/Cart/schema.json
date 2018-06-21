@@ -4,9 +4,12 @@
       "$ref": "dataTypes#/definitions/primaryKey"
     },
     "items": {
-      "$ref": "Product",
-      "belongsToMany": {
-        "through": "CartItem"
+      "type": "array",
+      "items": {
+        "$ref": "Product",
+        "belongsToMany": {
+          "through": "CartItem"
+        }
       }
     }
   },
