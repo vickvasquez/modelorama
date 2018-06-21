@@ -52,7 +52,7 @@ function _validateFrom(schema, data) {
 }
 
 function _fakeAll(schema, opts) {
-  jsf.option(_.merge(opts, defaults));
+  jsf.option(_.defaults(opts, defaults));
 
   return jsf({
     type: 'array',
@@ -62,7 +62,7 @@ function _fakeAll(schema, opts) {
 }
 
 function _fake(schema, opts) {
-  jsf.option(_.merge(opts, defaults));
+  jsf.option(_.defaults(opts, defaults));
 
   return jsf(schema, refs);
 }
