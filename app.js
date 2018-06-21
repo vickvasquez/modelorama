@@ -9,7 +9,7 @@ db.connect()
   .then(() => {
     const dbHook = require('jsonschema-form-mw');
 
-    app.use('/jsonschema-form-mw', require('serve-static')(dbHook.publicDir));
+    app.use('/jsonschema-form-mw', dbHook.distFiles());
     app.use(require('body-parser').json());
 
     app.all(/^\/db(\/.+?)?$/, (req, res) => {
