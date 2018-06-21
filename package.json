@@ -11,8 +11,8 @@
     "express": "^4.16.3",
     "is-my-json-valid": "^2.17.2",
     "json-schema-faker": "^0.5.0-rc13",
-    "json-schema-sequelizer": "^0.14.8",
-    "jsonschema-form-mw": "^0.1.2",
+    "json-schema-sequelizer": "^0.14.9",
+    "jsonschema-form-mw": "^0.2.0",
     "lodash": "^4.17.5",
     "sqlite3": "^4.0.0",
     "wargs": "^0.8.1"
