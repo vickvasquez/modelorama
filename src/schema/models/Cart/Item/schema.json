@@ -1,7 +1,10 @@
 {
   "properties": {
+    "id": {
+      "$ref": "dataTypes#/definitions/primaryKey"
+    },
     "qty": {
-      "type": "number"
+      "type": "integer"
     }
   },
   "required": [

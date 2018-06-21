@@ -1,6 +1,6 @@
 module.exports = {
   dialect: 'sqlite',
-  storage: ':memory:',
+  storage: `${__dirname}/db/data.sqlite`,
   directory: `${__dirname}/db`,
   define: {
     underscored: true,

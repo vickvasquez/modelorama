@@ -4,9 +4,7 @@
   "private": true,
   "main": "app.js",
   "scripts": {
-    "start": "node .",
-    "build": "npm run build:protobuf",
-    "build:protobuf": "protobuf-jsonschema src/models/protobuf/*.proto > src/models/definitions/protoTypes.json"
+    "start": "node ."
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -15,12 +13,8 @@
     "json-schema-faker": "^0.5.0-rc13",
     "json-schema-sequelizer": "^0.14.5",
     "lodash": "^4.17.5",
-    "pg": "^7.4.1",
     "serve-static": "^1.13.2",
+    "sqlite3": "^4.0.0",
     "wargs": "^0.8.1"
-  },
-  "devDependencies": {
-    "protobuf-jsonschema": "^1.1.1",
-    "sqlite3": "^4.0.0"
   }
 }

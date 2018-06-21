@@ -2,7 +2,7 @@
 
 const JSONSchemaSequelizer = require('json-schema-sequelizer');
 
-const db = require('./src/models');
+const db = require('./src/schema/models');
 const app = require('express')();
 
 db.connect()
