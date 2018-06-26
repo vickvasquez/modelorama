@@ -1,3 +1,4 @@
+
 # Schema first.™
 
 In our architecture we use Protobuf, _GraphQL or Swagger_ and JSON-Schema to validate the data passed around.
@@ -6,7 +7,17 @@ Schemas are defined several times, just to ensure the same validation happen on 
 
 This is troublesome, repetitive and boring.
 
+## What's all of this?
+
 Here we'll explore the idea behind "one schema to rule them all".
+
+JSON-Schema is a reusable definition that can be used to describe and validate simple objects.
+
+- The core piece is `json-schema-sequelizer`, which turns schemas into model definitions.
+- Used schemas are given to `json-schema-faker` for producing samples, and `is-my-json-valid` helps out to ensure everything is well formed.
+- The module `jsonschema-form-mw` included by `app.js` provides an experimental RESTful scaffolding based on `json-schema-sequelizer` models.
+
+> Scaffolding is still in development stage, any improvement here is appreciated!
 
 ## Overview
 
@@ -43,6 +54,7 @@ src
 - JSON-Schema is used to generate samples for seeds, fixtures, etc.
 - Sequelize models are described by JSON-Schema
 - Database migrations are granted for free
+- Scaffolding for basic RESTful-ops
 
 ## Quick intro
 
