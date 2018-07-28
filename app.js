@@ -11,7 +11,7 @@ db.connect()
     const port = process.env.PORT || 8081;
 
     app.listen(port, () => {
-      console.log(`Listening at http://localhost:${port}`);
+      console.log(`Listening at http://localhost:${port}/db`);
     });
   })
   .catch(error => {
