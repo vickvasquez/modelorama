@@ -61,7 +61,7 @@ Promise.resolve()
       },
     };
 
-    console.log('# Protobuf');
+    // console.log('# Protobuf');
 
     const _protobuf = _jst.protobuf;
 
@@ -144,7 +144,7 @@ Promise.resolve()
       console.log(e);
     }
 
-    console.log('# GraphQL');
+    // console.log('# GraphQL');
 
     const _schema = _jst.schema;
     const _schemaUsed = schemas.find(x => x.id === 'Cart');
