@@ -1,4 +1,18 @@
 {
+  "serviceDefinition": {
+    "calls": [
+      { "get": "Cart", "resp": "Cart" },
+      { "get": "Carts", "resp": "CartList" }
+    ]
+  },
+  "definitions": {
+    "CartList": {
+      "type": "array",
+      "items": {
+        "$ref": "Cart"
+      }
+    }
+  },
   "properties": {
     "id": {
       "$ref": "dataTypes#/definitions/primaryKey"

@@ -1,4 +1,18 @@
 {
+  "serviceDefinition": {
+    "calls": [
+      { "get": "Product", "resp": "Product" },
+      { "get": "Products", "resp": "ProductList" }
+    ]
+  },
+  "definitions": {
+    "ProductList": {
+      "type": "array",
+      "items": {
+        "$ref": "Product"
+      }
+    }
+  },
   "properties": {
     "id": {
       "$ref": "dataTypes#/definitions/primaryKey"

@@ -14,6 +14,7 @@
     "json-schema-sequelizer": "^0.15.1",
     "jsonschema-form-mw": "^0.2.0",
     "lodash": "^4.17.5",
+    "pg": "^7.4.3",
     "sqlite3": "^4.0.0",
     "wargs": "^0.8.1"
   }
