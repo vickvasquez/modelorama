@@ -16,6 +16,7 @@ JSON-Schema is a reusable definition that can be used to describe and validate s
 - The core piece is `json-schema-sequelizer`, which turns schemas into model definitions.
 - Used schemas are given to `json-schema-faker` for producing samples, and `is-my-json-valid` helps out to ensure everything is well formed.
 - The module `jsonschema-form-mw` included by `app.js` provides an experimental RESTful scaffolding based on `json-schema-sequelizer` models.
+- Also, thanks to the newly added `json-schema-to` is possible to generate Protobuf and GraphQL definitions from the same JSON-Schema!
 
 > Scaffolding is still in development stage, any improvement here is appreciated!
 
@@ -24,8 +25,8 @@ JSON-Schema is a reusable definition that can be used to describe and validate s
 Sources are Javascript code and JSON-Schema definitions.
 
 ```bash
-$ git clone git@github.com:agave/models-example.git
-$ cd models-example
+$ git clone git@github.com:pateketrueke/modelorama.git
+$ cd modelorama
 $ tree src
 src
 ├── api
@@ -49,7 +50,7 @@ src
 
 ## Features*
 
-> Protobuf/GQL definitions are planned to be generated from JSON-Schema too, all contributions are very welcome.
+> Protobuf/GQL definitions are under development (see [json-schema-to](https://github.com/pateketrueke/json-schema-to)), all contributions are very welcome.
 
 - JSON-Schema is used to generate samples for seeds, fixtures, etc.
 - Sequelize models are described by JSON-Schema
@@ -60,11 +61,11 @@ src
 
 Make sure you ran `npm i` to setup the required dependencies.
 
-1. Run `bin/db migrate --make` to create our initial migrations
-2. Run `bin/db migrate --up` to execute those migrations
-3. Run `bin/db migrate --apply "initial version"` to take a snapshot
+1. Run `make prune` and then `make migration` to setup the database
 
-> Snapshots are faster than running all migrations from ground up.
+## Protobuf / GraphQL
+
+1. Run `node schema.js` and see [how it works](https://github.com/pateketrueke/modelorama/blob/master/schema.js)
 
 ## Testing
 
@@ -72,7 +73,17 @@ A functional test is included, run `node test.js` to see the results.
 
 > As we enhance our JSON-Schema definitions with enough details to be validated we'll be able to generate more accurate data to be tested.
 
-## New models
+## Migrations
+
+In order to apply the migrations you must:
+
+1. Run `bin/db migrate --make` to create our initial migrations
+2. Run `bin/db migrate --up` to execute those migrations
+3. Run `bin/db migrate --apply "initial version"` to take a snapshot
+
+> Snapshots are faster than running all migrations from ground up.
+
+### New models
 
 1. Add your model definitions as `schema.json` files (see the sources)
 2. Generate  migrations from schema differences `bin/db migrate --make`
