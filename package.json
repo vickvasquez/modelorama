@@ -1,6 +1,8 @@
 {
-  "name": "models-example",
-  "version": "0.1.0",
+  "name": "modelorama",
+  "version": "0.0.0",
+  "description": "Tame schemas once and for all!",
+  "author": "Alvaro Cabrera <pateketrueke@gmail.com>",
   "private": true,
   "main": "app.js",
   "scripts": {

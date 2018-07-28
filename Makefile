@@ -4,9 +4,6 @@ run := unit
 help: Makefile ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-dev: ## Lift dev environment for this service
-	@npm run watch
-
 ci: ## Run tests and report coverage results! :wink:
 	@npm run test:coverage:$(run)
 	@npm run test:report -- -r html
