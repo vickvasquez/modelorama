@@ -30,22 +30,28 @@ $ cd modelorama
 $ tree src
 src
 ├── api
-│   └── models
-│       └── Product.js
+│   └── models
+│       └── Product.js
 └── schema
     ├── index.js
     ├── models
-    │   ├── Cart
-    │   │   ├── Item
-    │   │   │   └── schema.json
-    │   │   └── schema.json
-    │   ├── Product
-    │   │   └── schema.json
-    │   └── index.js
+    │   ├── Cart
+    │   │   ├── Item
+    │   │   │   ├── attributes.json
+    │   │   │   ├── schema.json
+    │   │   │   └── uiSchema.json
+    │   │   ├── attributes.json
+    │   │   ├── schema.json
+    │   │   └── uiSchema.json
+    │   ├── Product
+    │   │   ├── attributes.json
+    │   │   ├── schema.json
+    │   │   └── uiSchema.json
+    │   └── index.js
     └── types
         └── dataTypes.json
 
-8 directories, 7 files
+8 directories, 13 files
 ```
 
 ## Features*
