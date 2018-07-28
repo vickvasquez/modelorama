@@ -9,12 +9,7 @@ const path = require('path');
 
 const JST = require('json-schema-to');
 
-const db = require('./src/schema/models');
-
-const schemas = Object.keys(db.$refs).reduce((prev, cur) => {
-  prev.push(db.$refs[cur].$schema);
-  return prev;
-}, []);
+const { schemas } = require('./src/schema/models');
 
 let serverInstance;
 
@@ -142,13 +137,14 @@ Promise.resolve()
 
     console.log('# GraphQL setup');
 
+    const _schema = _jst.graphql;
     const _schemaUsed = schemas.find(x => x.id === 'Cart');
 
     try {
       debug('build schema');
 
       const gql = test.makeExecutableSchema({
-        typeDefs: [_jst.graphql, test.trim(`
+        typeDefs: [_schema, test.trim(`
           type Query {
             status: Boolean
           }
