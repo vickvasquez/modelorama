@@ -1,46 +1,30 @@
+const debug = require('debug')('schema.js');
+
+if (process.argv.slice(2).includes('--debug')) {
+  require('debug').enable('schema.js');
+}
+
 const glob = require('glob');
 const path = require('path');
 
-const test = require('json-schema-to/test/utils');
 const JST = require('json-schema-to');
-const jsf = require('json-schema-faker');
 
-const refs = [
-  {
-    id: 'dataTypes',
-    ...require('./src/schema/types/dataTypes.json'),
-  },
-];
+const db = require('./src/schema/models');
 
-function int(min = 1, max = 100) {
-  return Math.round(Math.random() * max) + min;
-}
-
-const schemas = glob
-  .sync('**/schema.json', { cwd: `${__dirname}/src/schema/models` })
-  .map(schemaFile => {
-    const schemaDefinition = require(`${__dirname}/src/schema/models/${schemaFile}`);
-
-    if (!schemaDefinition.id) {
-      const modelId = schemaFile.replace(/\/(?:schema\.json)?/g, '');
-
-      schemaDefinition.id = modelId;
-    }
-
-    refs.push(schemaDefinition);
-
-    return schemaDefinition;
-  });
+const schemas = Object.keys(db.$refs).reduce((prev, cur) => {
+  prev.push(db.$refs[cur].$schema);
+  return prev;
+}, []);
 
 let serverInstance;
 
 Promise.resolve()
-  .then(() => Promise.all(schemas.map(schema => {
-    return schema.serviceDefinition && new JST(schema).scan(__dirname, refs);
-  })))
-  .then(async results => {
-    // return;
-    const _jst = JST.merge('osom', results);
+  .then(async () => {
+    const test = require('json-schema-to/test/utils');
+    const jsf = require('json-schema-faker');
+
+    const _bundle = await JST.load(schemas);
+    const _jst = JST.merge('osom', _bundle);
 
     const {
       Cart, CartList, Product, ProductList,
@@ -48,26 +32,28 @@ Promise.resolve()
 
     const storeMock = {
       Cart() {
-        return jsf(Cart, refs);
+        return jsf(Cart, schemas);
       },
       Carts() {
-        return jsf(CartList, refs)
+        return jsf(CartList, schemas)
       },
       Products() {
-        return jsf(ProductList, refs)
+        return jsf(ProductList, schemas)
       },
       Product() {
-        return jsf(Product, refs)
+        return jsf(Product, schemas)
       },
     };
 
-    // console.log('# Protobuf');
+    console.log('# Protobuf setup');
 
     const _protobuf = _jst.protobuf;
 
     test.mockFs({
       'generated.proto': Buffer.from(`${_protobuf}\nmessage Empty {}`),
     });
+
+    debug('starting server');
 
     serverInstance = new test.Server();
 
@@ -78,9 +64,13 @@ Promise.resolve()
 
         deadline.setSeconds(deadline.getSeconds() + 3);
 
+        debug('make request');
+
         client[method](payload, { deadline }, async (error, response) => {
+          debug('validate response');
+
           const validate = test.is({ $ref: modelId }, {
-            schemas: refs.reduce((prev, cur) => {
+            schemas: schemas.reduce((prev, cur) => {
               prev[cur.id] = cur;
               return prev;
             }, {}),
@@ -101,11 +91,15 @@ Promise.resolve()
     }
 
     try {
+      debug('setup gateway');
+
       const protoOptions = {};
       const packageDefinition = test.loadSync('generated.proto', protoOptions);
       const packageObject = test.loadPackageDefinition(packageDefinition);
       const Handler = packageObject.osom.Osom;
       const gateway = new Handler('0.0.0.0:50051', test.credentials.createInsecure());
+
+      debug('services registration');
 
       serverInstance.addService(Handler.service, {
         cart(ctx, reply) {
@@ -121,6 +115,8 @@ Promise.resolve()
           reply(null, storeMock.Products());
         },
       });
+
+      debug('starting server');
 
       serverInstance.bind('0.0.0.0:50051', test.ServerCredentials.createInsecure());
       serverInstance.start();
@@ -144,14 +140,15 @@ Promise.resolve()
       console.log(e);
     }
 
-    // console.log('# GraphQL');
+    console.log('# GraphQL setup');
 
-    const _schema = _jst.schema;
     const _schemaUsed = schemas.find(x => x.id === 'Cart');
 
     try {
+      debug('build schema');
+
       const gql = test.makeExecutableSchema({
-        typeDefs: [_schema, test.trim(`
+        typeDefs: [_jst.graphql, test.trim(`
           type Query {
             status: Boolean
           }
@@ -181,12 +178,16 @@ Promise.resolve()
         }
       `;
 
+      debug('make request');
+
       const response = await test.graphql(gql, query, {
         ...storeMock,
         async Cart() {
           return serverInstance.invoke('Cart', 'cart', {});
         },
       });
+
+      debug('validate response');
 
       const fixedSchema = {
         type: 'object',
@@ -200,7 +201,7 @@ Promise.resolve()
       };
 
       const validate = test.is(fixedSchema, {
-        schemas: refs.reduce((prev, cur) => {
+        schemas: schemas.reduce((prev, cur) => {
           prev[cur.id] = cur;
           return prev;
         }, {}),
