@@ -27,14 +27,12 @@ function main(_jst) {
 
   const jsf = require('json-schema-faker');
 
-  const Cart = _jst.$refs.Cart;
-  const CartList = _jst.$refs.CartList;
-  const Product = _jst.$refs.Product;
-  const ProductList = _jst.$refs.ProductList;
-
   const resolvers = {
     Cart() {
-      return jsf(Cart, _schemas);
+      return jsf(_jst.$refs.Cart, _schemas);
+    },
+    Product() {
+      return jsf(_jst.$refs.Product, _schemas);
     },
   };
 
