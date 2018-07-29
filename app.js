@@ -1,17 +1,20 @@
 'use strict';
 
-const db = require('./src/schema/models');
+const Service = require('json-schema-to').Service;
 
-const JST = require('json-schema-to');
 const app = require('express')();
+const db = require('./src/schema/models');
 
 app.use(require('body-parser').json());
 app.use(require('jsonschema-form-mw')(db));
 
 const _schemas = db.schemas;
 
+const jsf = require('json-schema-faker');
+
 function main(_jst) {
   const modelSchema = _jst.graphql;
+
   const baseSchema = `
     type Query {
       dummy: [String]
@@ -25,14 +28,12 @@ function main(_jst) {
     }
   `;
 
-  const jsf = require('json-schema-faker');
-
   const resolvers = {
-    Cart() {
-      return jsf(_jst.$refs.Cart, _schemas);
-    },
-    Product() {
-      return jsf(_jst.$refs.Product, _schemas);
+    Query: {
+      Cart: () => jsf(_jst.$refs.Cart, _schemas),
+      Product: () => jsf(_jst.$refs.Product, _schemas),
+      Carts: () => jsf(_jst.$refs.CartList, _schemas),
+      Products: () => jsf(_jst.$refs.ProductList, _schemas),
     },
   };
 
@@ -44,12 +45,12 @@ function main(_jst) {
   const gql = require('graphql');
   const gqltools = require('graphql-tools');
 
-  const _schema = gqltools.makeExecutableSchema({ typeDefs });
+  const _schema = gqltools.makeExecutableSchema({ typeDefs, resolvers });
 
   app.use('/api', (req, res, next) => {
     const query = req.body.query || req.query.body;
 
-    gql.graphql(_schema, query, resolvers)
+    gql.graphql(_schema, query, {})
       .then(response => {
         res.json(response);
       })
@@ -66,7 +67,7 @@ function main(_jst) {
 
 Promise.resolve()
   .then(() => db.connect())
-  .then(() => JST.load(_schemas).then(_bundle => JST.merge('webapp', _bundle)))
+  .then(() => Service.load(_schemas).then(_bundle => Service.merge('webapp', _bundle)))
   .then(main)
   .catch(error => {
     console.log(error.stack);

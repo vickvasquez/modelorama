@@ -9,7 +9,7 @@ if (process.argv.slice(2).indexOf('--debug') !== -1) {
 const glob = require('glob');
 const path = require('path');
 
-const JST = require('json-schema-to');
+const Service = require('json-schema-to').Service;
 
 const schemas = require('./src/schema/models').schemas;
 
@@ -19,9 +19,9 @@ const test = require('json-schema-to/test/utils');
 const jsf = require('json-schema-faker');
 
 Promise.resolve()
-  .then(() => JST.load(schemas))
+  .then(() => Service.load(schemas))
   .then(_bundle => {
-    const _jst = JST.merge('osom', _bundle);
+    const _jst = Service.merge('osom', _bundle);
 
     const Cart = _jst.$refs.Cart;
     const CartList = _jst.$refs.CartList;
