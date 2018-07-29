@@ -5,11 +5,12 @@ const db = require('./src/schema/models');
 const JST = require('json-schema-to');
 const app = require('express')();
 
+app.use(require('body-parser').json());
+app.use(require('jsonschema-form-mw')(db));
+
 const _schemas = db.schemas;
 
 function main(_jst) {
-  const ApolloServer = require('apollo-server-express').ApolloServer;
-
   const modelSchema = _jst.graphql;
   const baseSchema = `
     type Query {
@@ -32,11 +33,8 @@ function main(_jst) {
   const ProductList = _jst.$refs.ProductList;
 
   const resolvers = {
-    Mutation: {},
-    Query: {
-      Cart() {
-        return jsf(Cart, _schemas);
-      },
+    Cart() {
+      return jsf(Cart, _schemas);
     },
   };
 
@@ -45,20 +43,20 @@ function main(_jst) {
     modelSchema,
   ];
 
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    context: req => req,
-    formatError: error => _.omit(error, ['locations']),
-  });
+  const gql = require('graphql');
+  const gqltools = require('graphql-tools');
 
-  server.applyMiddleware({
-    app,
-    path: '/api',
-  });
+  const _schema = gqltools.makeExecutableSchema({ typeDefs });
 
-  app.use(require('body-parser').json());
-  app.use(require('jsonschema-form-mw')(db));
+  app.use('/api', (req, res, next) => {
+    const query = req.body.query || req.query.body;
+
+    gql.graphql(_schema, query, resolvers)
+      .then(response => {
+        res.json(response);
+      })
+      .catch(next);
+  });
 
   const port = process.env.PORT || 8081;
 
@@ -70,10 +68,8 @@ function main(_jst) {
 
 Promise.resolve()
   .then(() => db.connect())
-  .then(() => {
-    return JST.load(_schemas).then(_bundle => JST.merge('webapp', _bundle))
-  })
-  .then(() => main())
+  .then(() => JST.load(_schemas).then(_bundle => JST.merge('webapp', _bundle)))
+  .then(main)
   .catch(error => {
     console.log(error.stack);
     process.exit(1);
