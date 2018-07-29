@@ -5,14 +5,10 @@ const db = require('./src/schema/models');
 const JST = require('json-schema-to');
 const app = require('express')();
 
-async function main() {
-  await db.connect();
+const _schemas = db.schemas;
 
-  const { ApolloServer } = require('apollo-server-express');
-
-  const _schemas = db.schemas;
-  const _bundle = await JST.load(_schemas);
-  const _jst = JST.merge('webapp', _bundle);
+function main(_jst) {
+  const ApolloServer = require('apollo-server-express').ApolloServer;
 
   const modelSchema = _jst.graphql;
   const baseSchema = `
@@ -30,9 +26,10 @@ async function main() {
 
   const jsf = require('json-schema-faker');
 
-  const {
-    Cart, CartList, Product, ProductList,
-  } = _jst.$refs;
+  const Cart = _jst.$refs.Cart;
+  const CartList = _jst.$refs.CartList;
+  const Product = _jst.$refs.Product;
+  const ProductList = _jst.$refs.ProductList;
 
   const resolvers = {
     Mutation: {},
@@ -72,9 +69,13 @@ async function main() {
 }
 
 Promise.resolve()
+  .then(() => db.connect())
+  .then(() => {
+    return JST.load(_schemas).then(_bundle => JST.merge('webapp', _bundle))
+  })
   .then(() => main())
   .catch(error => {
-    console.log(error);
+    console.log(error.stack);
     process.exit(1);
   });
 

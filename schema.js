@@ -1,6 +1,8 @@
+'use strict';
+
 const debug = require('debug')('schema.js');
 
-if (process.argv.slice(2).includes('--debug')) {
+if (process.argv.slice(2).indexOf('--debug') !== -1) {
   require('debug').enable('schema.js');
 }
 
@@ -9,21 +11,22 @@ const path = require('path');
 
 const JST = require('json-schema-to');
 
-const { schemas } = require('./src/schema/models');
+const schemas = require('./src/schema/models').schemas;
 
 let serverInstance;
 
-Promise.resolve()
-  .then(async () => {
-    const test = require('json-schema-to/test/utils');
-    const jsf = require('json-schema-faker');
+const test = require('json-schema-to/test/utils');
+const jsf = require('json-schema-faker');
 
-    const _bundle = await JST.load(schemas);
+Promise.resolve()
+  .then(() => JST.load(schemas))
+  .then(_bundle => {
     const _jst = JST.merge('osom', _bundle);
 
-    const {
-      Cart, CartList, Product, ProductList,
-    } = _jst.$refs;
+    const Cart = _jst.$refs.Cart;
+    const CartList = _jst.$refs.CartList;
+    const Product = _jst.$refs.Product;
+    const ProductList = _jst.$refs.ProductList;
 
     const storeMock = {
       Cart() {
@@ -52,7 +55,7 @@ Promise.resolve()
 
     serverInstance = new test.Server();
 
-    async function call(client, modelId, method, payload) {
+    function call(client, modelId, method, payload) {
       return new Promise(done => {
         const payload = {};
         const deadline = new Date();
@@ -61,7 +64,7 @@ Promise.resolve()
 
         debug('make request');
 
-        client[method](payload, { deadline }, async (error, response) => {
+        client[method](payload, { deadline }, (error, response) => {
           debug('validate response');
 
           const validate = test.is({ $ref: modelId }, {
@@ -71,18 +74,32 @@ Promise.resolve()
             }, {}),
           });
 
-          await validate(response);
+          return Promise.resolve()
+            .then(() => validate(response))
+            .then(() => {
+              console.log(error || 'OK');
+              console.log('>>> GRPC', validate.errors || 'OK');
 
-          console.log(error || 'OK');
-          console.log('>>> GRPC', validate.errors || 'OK');
+              if (validate.errors) {
+                console.log(JSON.stringify(response, null, 2));
+              }
 
-          if (validate.errors) {
-            console.log(JSON.stringify(response, null, 2));
-          }
-
-          done(response);
+              done(response);
+            });
         });
       })
+    }
+
+    function until(cb) {
+      return new Promise(ok => {
+        setTimeout(() => {
+          if (cb()) {
+            ok();
+          } else {
+            until(cb).then(ok);
+          }
+        }, 100);
+      });
     }
 
     try {
@@ -115,106 +132,96 @@ Promise.resolve()
 
       serverInstance.bind('0.0.0.0:50051', test.ServerCredentials.createInsecure());
       serverInstance.start();
-      serverInstance.invoke = (...args) => call(gateway, ...args);
-
-      async function until(cb) {
-        return new Promise(ok => {
-          setTimeout(() => {
-            if (cb()) {
-              ok();
-            } else {
-              until(cb).then(ok);
-            }
-          }, 100);
-        });
-      }
-
-      await until(() => serverInstance.started);
+      serverInstance.invoke = (service, method, data) => call(gateway, service, method, data);
     } catch (e) {
       console.log(_protobuf);
       console.log(e);
     }
 
-    console.log('# GraphQL setup');
+    return until(() => serverInstance.started)
+      .then(() => {
+        console.log('# GraphQL setup');
 
-    const _schema = _jst.graphql;
-    const _schemaUsed = schemas.find(x => x.id === 'Cart');
+        const _schema = _jst.graphql;
+        const _schemaUsed = schemas.find(x => x.id === 'Cart');
 
-    try {
-      debug('build schema');
+        try {
+          debug('build schema');
 
-      const gql = test.makeExecutableSchema({
-        typeDefs: [_schema, test.trim(`
-          type Query {
-            status: Boolean
-          }
-          type Mutation {
-            status: Boolean
-          }
-          schema {
-            query: Query
-            mutation: Mutation
-          }
-        `)],
-      });
+          const gql = test.makeExecutableSchema({
+            typeDefs: [_schema, test.trim(`
+              type Query {
+                status: Boolean
+              }
+              type Mutation {
+                status: Boolean
+              }
+              schema {
+                query: Query
+                mutation: Mutation
+              }
+            `)],
+          });
 
-      const query = `
-        query {
-          Cart {
-            id
-            items {
-              qty
-              Product {
+          const query = `
+            query {
+              Cart {
                 id
-                name
-                price
+                items {
+                  qty
+                  Product {
+                    id
+                    name
+                    price
+                  }
+                }
               }
             }
-          }
-        }
-      `;
+          `;
 
-      debug('make request');
+          debug('make request');
 
-      const response = await test.graphql(gql, query, {
-        ...storeMock,
-        async Cart() {
-          return serverInstance.invoke('Cart', 'cart', {});
-        },
-      });
-
-      debug('validate response');
-
-      const fixedSchema = {
-        type: 'object',
-        properties: {
-          data: {
-            Cart: {
-              $ref: 'Cart',
+          return test.graphql(gql, query, Object.assign({}, storeMock, {
+            Cart() {
+              return serverInstance.invoke('Cart', 'cart', {});
             },
-          },
-        },
-      };
+          })).then(response => {
+            debug('validate response');
 
-      const validate = test.is(fixedSchema, {
-        schemas: schemas.reduce((prev, cur) => {
-          prev[cur.id] = cur;
-          return prev;
-        }, {}),
+            const fixedSchema = {
+              type: 'object',
+              properties: {
+                data: {
+                  Cart: {
+                    $ref: 'Cart',
+                  },
+                },
+              },
+            };
+
+            const validate = test.is(fixedSchema, {
+              schemas: schemas.reduce((prev, cur) => {
+                prev[cur.id] = cur;
+                return prev;
+              }, {}),
+            });
+
+            return Promise.resolve()
+              .then(() => validate(response))
+              .then(() => {
+                console.log('>>> GRAPHQL', validate.errors || 'OK');
+                console.log(JSON.stringify(response, null, 2));
+              });
+          });
+        } catch (e) {
+          console.log(_schema);
+          console.log(e.message);
+          console.log(e.locations);
+        }
       });
-
-      await validate(response);
-
-      console.log('>>> GRAPHQL', validate.errors || 'OK');
-      console.log(JSON.stringify(response, null, 2));
-    } catch (e) {
-      console.log(_schema);
-      console.log(e.message);
-      console.log(e.locations);
-    }
   })
   .catch(e => {
-    console.log(e);
+    console.log(e.stack);
   })
   .then(() => {
     return new Promise(done => {
