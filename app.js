@@ -45,6 +45,14 @@ function main(_jst) {
   const gql = require('graphql');
   const gqltools = require('graphql-tools');
 
+  // const gqlsequelize = require('graphql-sequelize');
+
+  // resolvers.Query.Cart = gqlsequelize.resolver(db.models.Cart);
+  // resolvers.Query.Carts = gqlsequelize.resolver(db.models.Cart, { list: true });
+
+  // resolvers.Query.Product = gqlsequelize.resolver(db.models.Product);
+  // resolvers.Query.Products = gqlsequelize.resolver(db.models.Product, { list: true });
+
   const _schema = gqltools.makeExecutableSchema({ typeDefs, resolvers });
 
   app.use('/api', (req, res, next) => {
