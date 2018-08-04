@@ -1,0 +1,15 @@
+id: Cart
+
+service:
+  calls:
+  - get: Cart
+    resp: Cart
+  - get: Carts
+    resp: CartList
+    repeated: true # this should be automatic, given by `type: array` below
+
+definitions:
+  CartList:
+    type: array
+    items:
+      $ref: Cart

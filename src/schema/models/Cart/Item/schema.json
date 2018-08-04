@@ -1,0 +1,14 @@
+{
+  "id": "CartItem",
+  "properties": {
+    "id": {
+      "$ref": "dataTypes#/definitions/primaryKey"
+    },
+    "qty": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "qty"
+  ]
+}

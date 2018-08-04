@@ -1,0 +1,13 @@
+type Query {
+  dummy: [String]
+}
+type Mutation {
+  dummy: [String]
+}
+type Success {
+  success: Boolean
+}
+schema {
+  query: Query
+  mutation: Mutation
+}
