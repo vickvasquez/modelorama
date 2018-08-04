@@ -11,11 +11,11 @@ definitions:
   ProductList:
     type: array
     items:
-      "$ref": Product
+      $ref: Product
 
 properties:
   id:
-    "$ref": dataTypes#/definitions/primaryKey
+    $ref: dataTypes#/definitions/primaryKey
   name:
     type: string
   price:

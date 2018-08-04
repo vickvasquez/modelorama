@@ -11,15 +11,15 @@ definitions:
   CartList:
     type: array
     items:
-      "$ref": Cart
+      $ref: Cart
 
 properties:
   id:
-    "$ref": dataTypes#/definitions/primaryKey
+    $ref: dataTypes#/definitions/primaryKey
   items:
     type: array
     items:
-      "$ref": Product
+      $ref: Product
       belongsToMany:
         through:
           model: CartItem
