@@ -6,7 +6,10 @@
   "private": true,
   "main": "app.js",
   "scripts": {
-    "start": "node ."
+    "start": "node .",
+    "schema": "npm run schema-to:graphql && npm run schema-to:protobuf",
+    "schema-to:graphql": "json-schema-to -tw src/schema -c index --graphql",
+    "schema-to:protobuf": "json-schema-to -bptw src/schema -c index --protobuf -r ../common --json"
   },
   "dependencies": {
     "body-parser": "^1.18.2",

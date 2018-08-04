@@ -1,4 +1,4 @@
 *.log
 .DS_Store
+generated
 node_modules
-protoTypes.json
