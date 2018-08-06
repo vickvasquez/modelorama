@@ -5,14 +5,14 @@ const Resolver = require('sastre').Resolver;
 const path = require('path');
 
 class ModelsResolver {
-  constructor(container, settings) {
-    const refs = JSONSchemaSequelizer.refs(path.resolve(__dirname, '..'), 'types');
+  constructor(container, options) {
+    const refs = JSONSchemaSequelizer.refs(path.resolve(options.directory, '..'), 'types');
 
-    const db = this.database = new JSONSchemaSequelizer(settings.use_env_variable
-      ? process.env[settings.use_env_variable]
-      : settings, refs);
+    const db = this.database = new JSONSchemaSequelizer(options.settings.use_env_variable
+      ? process.env[options.settings.use_env_variable]
+      : options.settings, refs);
 
-    this.repository = new Resolver(container, __dirname, {
+    this.repository = new Resolver(container, options.directory, {
       before(name, definition) {
         if (definition.$schema) {
           db.add(definition);
