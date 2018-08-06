@@ -2,12 +2,18 @@
 
 const GRPCResolver = require('../helpers/grpc');
 const ModelsResolver = require('../helpers/models');
+const GraphQLResolver = require('../helpers/graphql');
 
 class Container {
   constructor() {
     this.controllers = new GRPCResolver(this, {
       directory: `${__dirname}/controllers`,
       filename: `${__dirname}/generated/index.proto`,
+    });
+
+    this.graphql = new GraphQLResolver(this, {
+      directory: `${__dirname}/graphql`,
+      filename: `${__dirname}/generated/index.gql`,
     });
 
     this.models = new ModelsResolver(this, {
