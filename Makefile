@@ -8,9 +8,16 @@ ci: ## Run tests and report coverage results! :wink:
 	@npm run test:coverage:$(run)
 	@npm run test:report -- -r html
 
+dev: ## Lift dev environment for this service
+	@npm run watch
+
 prune: ## Remove schema files and migrations
 	@((rm db/schema* > /dev/null 2>&1) && echo "Schema deleted") || echo "Schema already deleted"
 	@((rm db/migrations/*.js > /dev/null 2>&1) && echo "Migrations deleted") || echo "Migrations already deleted"
+	@((rm schema/generated/*.* > /dev/null 2>&1) && echo "Definitions deleted") || echo "Definitions already deleted"
+
+build: ## Generate schema definitions
+	@npm run schema
 
 migrate: ## Execute pending migrations
 	@bin/db migrate --up
