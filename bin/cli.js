@@ -83,7 +83,7 @@ Promise.resolve()
           echo(`# storage: ${opts.storage}\n`);
         }
 
-        if (!opts.connectionx) {
+        if (!opts.connection) {
           echo(`# connection: ${opts.dialect} (${opts.host}:${opts.port}) ${opts.database || 'N/A'}\n`);
         } else {
           echo(`# connection: ${opts.connection}\n`);
