@@ -1,8 +1,7 @@
-'use strict';
-
-const JSONSchemaSequelizer = require('json-schema-sequelizer');
-const Resolver = require('sastre').Resolver;
+const { Resolver } = require('sastre');
 const path = require('path');
+const jsf = require('json-schema-faker');
+const JSONSchemaSequelizer = require('json-schema-sequelizer');
 
 class ModelsResolver {
   constructor(container, options) {
@@ -34,6 +33,15 @@ class ModelsResolver {
 
         if (definition.$schema) {
           target = db.models[name];
+
+          target.fake = target.fakeOne = () =>
+            jsf.generate(definition.$schema, db.$refs);
+
+          target.fakeAll = () =>
+            jsf.generate({
+              type: 'array',
+              items: definition.$schema,
+            }, db.$refs);
         }
 
         if (definition.hooks) {
@@ -56,6 +64,10 @@ class ModelsResolver {
 
   connect() {
     return this.database.connect();
+  }
+
+  close() {
+    return this.database.close();
   }
 
   get(name) {

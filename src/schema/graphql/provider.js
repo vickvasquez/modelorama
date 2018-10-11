@@ -1,5 +1,5 @@
 module.exports = {
-  product() {
-    return this.getGateway('Product');
+  gateway() {
+    return this.getGateway();
   },
 };

@@ -5,25 +5,22 @@
   "author": "Alvaro Cabrera <pateketrueke@gmail.com>",
   "private": true,
   "main": "app.js",
+  "engines": {
+    "node": ">= 6"
+  },
   "scripts": {
     "start": "node .",
-    "watch": "nodemon .",
+    "watch": "nodemon -e json,yml,proto,gql,js -i '**/_generated/**' .",
     "schema": "npm run schema-to:graphql && npm run schema-to:protobuf",
-    "schema-to:graphql": "json-schema-to -tw src/schema -c index --graphql",
-    "schema-to:protobuf": "json-schema-to -bptw src/schema -c index --protobuf -r ../common --json"
+    "schema-to:graphql": "json-schema-to -tw src/schema -c index --graphql -d _generated",
+    "schema-to:protobuf": "json-schema-to -bptw src/schema -c index --protobuf -r ../common --json -d _generated"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
-    "graphql-relay": "^0.5.5",
-    "graphql-sequelize": "^9.0.1",
-    "is-my-json-valid": "^2.17.2",
     "json-schema-faker": "^0.5.0-rc16",
+    "json-schema-sequelizer": "^0.18.2",
     "json-schema-to": "0.0.6",
-    "lodash": "^4.17.5",
-    "passport": "^0.4.0",
-    "passport-http-bearer": "^1.0.1",
-    "pg": "^7.4.3",
     "sastre": "0.0.10",
     "wargs": "^0.8.1"
   },
@@ -31,8 +28,7 @@
     "@grpc/proto-loader": "^0.3.0",
     "graphql": "^0.13.2",
     "graphql-tools": "^3.0.5",
-    "grpc": "^1.13.1",
-    "mock-fs": "^4.5.0",
+    "grpc": "^1.15.1",
     "nodemon": "^1.18.3",
     "sqlite3": "^4.0.2"
   }

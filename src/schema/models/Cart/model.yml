@@ -2,9 +2,9 @@ id: Cart
 
 service:
   calls:
-  - get: Cart
+  - get: cart
     resp: Cart
-  - get: Carts
+  - get: carts
     resp: CartList
 
 definitions:

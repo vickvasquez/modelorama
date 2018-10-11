@@ -1,19 +1,17 @@
-'use strict';
+const startTime = Date.now();
 
 const schema = require('./src/schema');
-const app = require('express')();
+const express = require('express');
 
-const db = schema.models.database;
+const app = express();
 
 app.use(require('body-parser').json());
-app.use(require('jsonschema-form-mw')(db));
 
 function main() {
   const gql = require('graphql');
-  const gqltools = require('graphql-tools');
+  const gqlTools = require('graphql-tools');
 
-  const _definition = schema.graphql.getDefinition();
-  const _schema = gqltools.makeExecutableSchema(_definition);
+  const _schema = gqlTools.makeExecutableSchema(schema.graphql.getDefinition());
 
   app.use('/api', (req, res, next) => {
     const query = req.body.query || req.query.body;
@@ -31,8 +29,7 @@ function main() {
   const port = process.env.PORT || 8081;
 
   app.listen(port, () => {
-    console.log(`Listening at http://localhost:${port}/db`);
-    console.log(`GraphQL: http://localhost:${port}/api`);
+    console.log(`GraphQL: http://localhost:${port}/api (${(Date.now() - startTime) / 1000}ms)`);
   });
 }
 

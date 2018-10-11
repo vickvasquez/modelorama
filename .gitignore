@@ -1,4 +1,4 @@
 *.log
 .DS_Store
-generated
+_generated
 node_modules

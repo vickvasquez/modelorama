@@ -1,6 +1,8 @@
-module.exports = ctx => ({
-  Products() {
-    return ctx.product.Products()
-      .then(x => x.data);
+module.exports = ({ gateway }) => ({
+  product() {
+    return gateway.Product.product();
+  },
+  products() {
+    return gateway.Product.products().then(x => x.data);
   },
 });

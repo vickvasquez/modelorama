@@ -1,13 +1,8 @@
-'use strict';
+const { Resolver } = require('sastre');
+const path = require('path');
+const grpc = require('grpc');
 
 const TIMEOUT = process.env.GRPC_TIMEOUT || 10;
-
-const inspect = require('util').inspect;
-const path = require('path');
-
-const _ = require('lodash');
-const grpc = require('grpc');
-const protoLoader = require('@grpc/proto-loader');
 
 const protoOptions = {
   longs: String,
@@ -16,8 +11,6 @@ const protoOptions = {
   oneofs: true,
   keepCase: false,
 };
-
-const Resolver = require('sastre').Resolver;
 
 class GRPCResolver {
   constructor(container, options) {
@@ -31,7 +24,7 @@ class GRPCResolver {
       enumerable: false,
       get: () => {
         if (!_pkg) {
-          _pkg = protoLoader.loadSync(options.filename, protoOptions);
+          _pkg = require('@grpc/proto-loader').loadSync(options.filename, protoOptions);
           _pkg = grpc.loadPackageDefinition(_pkg).schema;
         }
 
@@ -62,7 +55,7 @@ class GRPCResolver {
 
           Object.keys(this._pkg).forEach(service => {
             _gateway[service] = GRPCResolver.bindHandlers(this._pkg[service],
-              '0.0.0.0:50051' || `${service}:80`,
+              process.env.HOME === '/root' ? `${service}:80` : '0.0.0.0:50051',
               credentials);
           });
         }
@@ -89,14 +82,23 @@ class GRPCResolver {
           let response;
 
           return Promise.resolve()
-            .then(() => controllerInstance[method](request))
+            .then(() => {
+              if (typeof controllerInstance[method] !== 'function') {
+                throw new Error(`Undefined '${ctrlName}.${method}()' method`);
+              }
+
+              return controllerInstance[method](request);
+            })
             .then(_response => {
               response = _response;
 
               callback(null, response);
             })
             .catch(err => {
-              console.warn(err.stack); // eslint-ignore
+              callback({
+                code: err.code || grpc.status.INTERNAL,
+                message: err.message,
+              });
             });
         };
       });
@@ -138,8 +140,8 @@ class GRPCResolver {
     });
   }
 
-  getGateway(name) {
-    return this._gateway[name];
+  getGateway() {
+    return this._gateway;
   }
 
   connect() {
@@ -147,6 +149,10 @@ class GRPCResolver {
     this._server.start();
 
     return this;
+  }
+
+  close() {
+    return this._server.forceShutdown();
   }
 
   get(name) {

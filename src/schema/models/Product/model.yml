@@ -2,9 +2,9 @@ id: Product
 
 service:
   calls:
-  - get: Product
+  - get: product
     resp: Product
-  - get: Products
+  - get: products
     resp: ProductList
 
 definitions:

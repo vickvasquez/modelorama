@@ -1,7 +1,4 @@
-'use strict';
-
-const Resolver = require('sastre').Resolver;
-
+const { Resolver } = require('sastre');
 const fs = require('fs');
 const path = require('path');
 
@@ -16,7 +13,7 @@ class GraphQLResolver {
       get: () => {
         if (!_schema) {
           const schemaCommon = path.resolve(__dirname, '../schema/common.gql');
-          const schemaIndex = path.resolve(__dirname, '../schema/generated/index.gql');
+          const schemaIndex = path.resolve(__dirname, '../schema/_generated/index.gql');
 
           const typeDefs = [
             schemaCommon,
