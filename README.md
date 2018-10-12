@@ -1,98 +1,212 @@
+Modelorama showcases Protobuf, GraphQL and JSON-Schema cooperating to achieve a solid service-based architecture for web applications.
 
-# Schema first.™
+The front-end API is built on GraphQL, communication between back-end services is done with gRPC.
 
-In our architecture we use Protobuf, _GraphQL or Swagger_ and JSON-Schema to validate the data passed around.
+The database is built on top of Sequelize, also powered by JSON-Schema.
 
-Schemas are defined several times, just to ensure the same validation happen on all endpoints.
+# Table of contents
 
-This is troublesome, repetitive and boring.
+- [How it works?](#how-it-works)
+- [Tools used](#tools-used)
+- [Quick start](#quick-start)
+  - [GraphQL](#graphql)
+  - [Models](#models)
+  - [Migrations](#migrations)
 
-## What's all of this?
+## How it works?
 
-Here we'll explore the idea behind "one schema to rule them all".
+&mdash; **Types** are declared by JSON-Schema:
 
-JSON-Schema is a reusable definition that can be used to describe and validate simple objects.
-
-- The core piece is `json-schema-sequelizer`, which turns schemas into model definitions.
-- Used schemas are given to `json-schema-faker` for producing samples, and `is-my-json-valid` helps out to ensure everything is well formed.
-- The module `jsonschema-form-mw` included by `app.js` provides an experimental RESTful scaffolding based on `json-schema-sequelizer` models.
-- Also, thanks to the newly added `json-schema-to` is possible to generate Protobuf and GraphQL definitions from the same JSON-Schema!
-
-> Scaffolding is still in development stage, any improvement here is appreciated!
-
-## Overview
-
-Sources are Javascript code and JSON-Schema definitions.
-
-```bash
-$ git clone git@github.com:pateketrueke/modelorama.git
-$ cd modelorama
-$ tree src
-src
-├── api
-│   └── models
-│       └── Product.js
-└── schema
-    ├── index.js
-    ├── models
-    │   ├── Cart
-    │   │   ├── Item
-    │   │   │   ├── attributes.json
-    │   │   │   ├── schema.json
-    │   │   │   └── uiSchema.json
-    │   │   ├── attributes.json
-    │   │   ├── schema.json
-    │   │   └── uiSchema.json
-    │   ├── Product
-    │   │   ├── attributes.json
-    │   │   ├── schema.json
-    │   │   └── uiSchema.json
-    │   └── index.js
-    └── types
-        └── dataTypes.json
-
-8 directories, 13 files
+```json
+{
+  "id": "Example",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    }
+  },
+  "required": ["name"]
+}
 ```
 
-## Features*
+This can be traduced to GraphQL:
 
-> Protobuf/GQL definitions are under development (see [json-schema-to](https://github.com/pateketrueke/json-schema-to)), all contributions are very welcome.
+```graphql
+type Example {
+  name: String!
+}
+```
 
-- JSON-Schema is used to generate samples for seeds, fixtures, etc.
-- Sequelize models are described by JSON-Schema
-- Database migrations are granted for free
-- Scaffolding for basic RESTful-ops
+Protobuf can be generated the same way:
 
-## Quick intro
+```protobuf
+message Example {
+  required string name = 1;
+}
+```
 
-Make sure you ran `npm i` to setup the required dependencies.
+All this means:
 
-1. Run `make prune` and then `make migration` to setup the database
+- GraphQL and Protobuf can be used to validate shape and types on any message being transmitted
+- JSON-Schema can be used to validate format, content and advanced relationships of the data itself
 
-## Protobuf / GraphQL
+> JSON-Schema helps where GraphQL/Protobuf slacks off.
 
-1. Run `node schema.js` and see [how it works](https://github.com/pateketrueke/modelorama/blob/master/schema.js)
+&mdash; **Services** are described using JSON-Schema too:
 
-## Testing
+```yaml
+id: Test
 
-A functional test is included, run `node test.js` to see the results.
+service:
+  calls:
+  - get: example
+    resp: Example
+  - get: examples
+    resp: ExampleList
 
-> As we enhance our JSON-Schema definitions with enough details to be validated we'll be able to generate more accurate data to be tested.
+definitions:
+  Example: !include schema.json
+  ExampleList:
+    type: array
+    items:
+      $ref: Example
+```
 
-## Migrations
+> We're using YAML here for brevity, so both formats are supported.
 
-In order to apply the migrations you must:
+Now we can generate a working GraphQL schema:
+
+```graphql
+extend type Query {
+  example: Example
+  examples: [Example]
+}
+type Example {
+  name: String!
+}
+```
+
+With its corresponding Protobuf service definition:
+
+```protobuf
+syntax = "proto3";
+package test;
+service TestService {
+  rpc example(Noop) returns(Example);
+  rpc examples(Noop) returns(ExampleList);
+}
+message Noop {
+}
+message Example {
+  required string name = 1;
+}
+message ExampleList {
+  repeated Example data = 1;
+}
+```
+
+Once all definitions are generated we can export them to be consumed by several services in different technologies.
+
+> Here we'll be using plain Javascript objects or modules to shape our controllers or handlers.
+
+&mdash; **Controllers** are object definitions or classes matching the shape of declared service calls.
+
+E.g. `Test.example` and `Test.examples` should be callable methods:
+
+```js
+module.exports = {
+  example() {},
+  examples() {},
+};
+```
+
+## Tools used
+
+JSON-Schema is required, hence, to build several stuff:
+
+- [json-schema-to](https://www.npmjs.com/package/json-schema-to) &mdash; generate GraphQL/Protobuf definitions
+- [json-schema-faker](https://www.npmjs.com/package/json-schema-faker) &mdash; produce random samples
+- [json-schema-sequelizer](https://www.npmjs.com/package/json-schema-sequelizer) &mdash; define models and its migrations
+
+For the application logic and tooling we're using:
+
+- [graphql](https://www.npmjs.com/package/graphql), [graphl-tools](https://www.npmjs.com/package/graphql-tools) &mdash; for the front-end API
+- [grpc](https://www.npmjs.com/package/grpc), [@grpc/proto-loader](https://www.npmjs.com/package/@grpc/proto-loader) &mdash; between-services gateway
+- [express](https://www.npmjs.com/package/body-parser),  [body-parser](https://www.npmjs.com/package/express) &mdash; web-server with `application/json` support
+- [sastre](https://www.npmjs.com/package/sastre) &mdash; to compose Javascript modules as GraphQL/gRPC handlers
+- [wargs](https://www.npmjs.com/package/wargs) &mdash; CLI parser for `bin/db` binary, use for migrations and such
+- [sqlite3](https://www.npmjs.com/package/sqlite3) &mdash; light-weight database, used by Sequelize
+- [nodemon](https://www.npmjs.com/package/nodemon) &mdash; watch sources and reload, for development
+
+## Quick start
+
+Clone this repo quickly with `degit`:
+
+```bash
+$ npx degit pateketrueke/modelorama my-project
+$ cd my-project
+$ npm ci
+```
+
+- Run `make prune` and then `make migration` to setup the database.
+- Run `node test.js` to check and populate the database.
+- Run `make build` to generate the schemas.
+
+> To display all available tasks just run `make` without arguments.
+
+### GraphQL
+
+Run `npm start` to start the API:
+
+```
+GraphQL: http://localhost:8081/api (2.686ms)
+```
+
+Make a GraphQL request (`GET` is supported):
+
+```bash
+$ http 'localhost:8081/api?body=query{products{id,name}}'
+```
+
+> Here we're using [httpie](https://httpie.org/) to make the requests.
+
+GraphQL handlers or resolvers can talk to other services through gRPC calls.
+
+&mdash; See the [web-server](/blob/master/app.js), [GraphQL](/blob/master/src/helpers/graphql.js) and [gateway](/blob/master/src/helpers/grpc.js) implementations.
+
+### Models
+
+Adding new types to the system mandate three details:
+
+- Model/JSON-Schema definition at `src/schema/models`
+- GraphQL resolver at `src/schema/graphql`
+- gRPC handler at `src/schema/controllers`
+
+Run `make gen model=Example` to generate these files and tweak as you need.
+
+> To get rid of generated models you can execute `make undo model=Example` to remove them.
+
+&mdash; See the [models](/blob/master/src/helpers/models.js) implementation.
+
+Handlers can receive their dependencies by using `provider.js` modules, they works perfectly on models and controllers.
+
+&mdash; Please [read the sources](/blob/master/src/schema) to get a better picture.
+
+### Migrations
+
+> Remember that migrations are not perfect, always review the generated code twice and tweak until it matches your needs before commiting.
+
+Now, in order to migrate the database you MUST:
 
 1. Run `bin/db migrate --make` to create our initial migrations
 2. Run `bin/db migrate --up` to execute those migrations
 3. Run `bin/db migrate --apply "initial version"` to take a snapshot
 
+Run `git commit` to keep your changes, or `make prune` to discard them.
+
+> Every modification on the schemas MUST be reflected by repeating the steps described above to ensure atomic changes over time.
+
+The `db/schema.js` file is a single-shot migration or snapshot from the current database state.
+
 > Snapshots are faster than running all migrations from ground up.
-
-### New models
-
-1. Add your model definitions as `schema.json` files (see the sources)
-2. Generate  migrations from schema differences `bin/db migrate --make`
-3. Save a snapshot from the whole schema `bin/db migrate --apply "optional description"`
-
-Every time you change something on your `schemas` you MUST repeat the steps 2 and 3, preferably doing fewer changes at once.
