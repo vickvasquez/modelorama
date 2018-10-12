@@ -51,7 +51,7 @@ let _db;
 function db(cb) {
   if (['migrate', 'backup', 'config'].indexOf(cmd) !== -1) {
     _cli = _cli || require('json-schema-sequelizer/cli');
-    _db = _db || require('../src/api').models.database;
+    _db = _db || require('../src/schema').models.database;
 
     return cb(_db);
   }
@@ -64,12 +64,8 @@ function echo(str)  {
 Promise.resolve()
   .then(() => db(x => x.connect()))
   .then(() => {
-    if (cmd === 'migrate') {
-      return db(x => _cli.migrate(x, options));
-    }
-
-    if (cmd === 'backup') {
-      return db(x => _cli.backup(x, options));
+    if (cmd === 'migrate' || cmd === 'backup') {
+      return db(x => _cli.execute(x, options));
     }
 
     if (cmd === 'config') {
