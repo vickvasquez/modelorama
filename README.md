@@ -149,11 +149,12 @@ $ cd my-project
 $ npm ci
 ```
 
-- Run `make prune` and then `make migration` to setup the database.
-- Run `node test.js` to check and populate the database.
 - Run `make build` to generate the schemas.
+- Run `make prune` and then `make migration` to setup the database.
 
 > To display all available tasks just run `make` without arguments.
+
+Optionally, you can execute `node test.js` to sync and populate the database.
 
 ### GraphQL
 
@@ -173,7 +174,7 @@ $ http 'localhost:8081/api?body=query{products{id,name}}'
 
 GraphQL handlers or resolvers can talk to other services through gRPC calls.
 
-&mdash; See the [web-server](/blob/master/app.js), [GraphQL](/blob/master/src/helpers/graphql.js) and [gateway](/blob/master/src/helpers/grpc.js) implementations.
+&mdash; See the [web-server](/blob/master/app.js), [graphql](/blob/master/src/helpers/graphql.js) and [gateway](/blob/master/src/helpers/grpc.js) implementations.
 
 ### Models
 
@@ -185,7 +186,7 @@ Adding new types to the system mandate three details:
 
 Run `make gen model=Example` to generate these files and tweak as you need.
 
-> To get rid of generated models you can execute `make undo model=Example` to remove them.
+> To get rid of generated files you can execute `make undo model=Example` to remove them.
 
 &mdash; See the [models](/blob/master/src/helpers/models.js) implementation.
 
@@ -195,7 +196,7 @@ Handlers can receive their dependencies by using `provider.js` modules, they wor
 
 ### Migrations
 
-> Remember that migrations are not perfect, always review the generated code twice and tweak until it matches your needs before commiting.
+> Always review the generated code twice and tweak until it matches your needs before commiting.
 
 Now, in order to migrate the database you MUST:
 
