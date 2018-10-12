@@ -174,7 +174,7 @@ $ http 'localhost:8081/api?body=query{products{id,name}}'
 
 GraphQL handlers or resolvers can talk to other services through gRPC calls.
 
-&mdash; See the [web-server](/blob/master/app.js), [graphql](/blob/master/src/helpers/graphql.js) and [gateway](/blob/master/src/helpers/grpc.js) implementations.
+&mdash; See the [web-server](/app.js), [graphql](/src/helpers/graphql.js) and [gateway](/src/helpers/grpc.js) implementations.
 
 ### Models
 
@@ -188,11 +188,11 @@ Run `make gen model=Example` to generate these files and tweak as you need.
 
 > To get rid of generated files you can execute `make undo model=Example` to remove them.
 
-&mdash; See the [models](/blob/master/src/helpers/models.js) implementation.
+&mdash; See the [models](/src/helpers/models.js) implementation.
 
 Handlers can receive their dependencies by using `provider.js` modules, they works perfectly on models and controllers.
 
-&mdash; Please [read the sources](/blob/master/src/schema) to get a better picture.
+&mdash; Please [read the sources](/src/schema) to get a better picture.
 
 ### Migrations
 
