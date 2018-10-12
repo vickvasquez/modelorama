@@ -40,7 +40,3 @@ Promise.resolve()
     console.log(error.stack);
     process.exit(1);
   });
-
-process.on('exit', () => {
-  db.close();
-});

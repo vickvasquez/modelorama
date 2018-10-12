@@ -24,7 +24,7 @@ class GraphQLResolver {
         }
 
         return _schema;
-      }
+      },
     });
   }
 
@@ -62,7 +62,7 @@ class GraphQLResolver {
                   }
 
                   throw new Error(`${_err.description || _err.message} (${_err.original.errno})`);
-                })
+                });
             };
           }
         });

@@ -1,5 +1,4 @@
 const { Resolver } = require('sastre');
-const path = require('path');
 const grpc = require('grpc');
 
 const TIMEOUT = process.env.GRPC_TIMEOUT || 10;
@@ -42,7 +41,7 @@ class GRPCResolver {
         }
 
         return _server;
-      }
+      },
     });
 
     Object.defineProperty(this, '_gateway', {
@@ -68,7 +67,7 @@ class GRPCResolver {
   static registerHandlers(pkg, repo, server) {
     Object.keys(repo.registry).forEach(ctrlName => {
       if (!pkg[ctrlName]) {
-        throw new Error(`Unknown '${ctrlName}' service in ${index}`);
+        throw new Error(`Unknown '${ctrlName}' service`);
       }
 
       const protoService = pkg[ctrlName].service;

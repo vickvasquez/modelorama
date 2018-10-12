@@ -18,15 +18,15 @@ class ModelsResolver {
           return;
         }
 
-        const attributes = definition.attributes;
-        const options = definition.options;
+        const _attributes = definition.attributes;
+        const _options = definition.options;
 
         delete definition.attributes;
         delete definition.options;
 
-        const fixedOptions = Object.assign({}, options, definition);
+        const fixedOptions = Object.assign({}, _options, definition);
 
-        return db.sequelize.define(name, definition.attributes || {}, fixedOptions);
+        return db.sequelize.define(name, _attributes || {}, fixedOptions);
       },
       after(name, definition) {
         let target = definition;
