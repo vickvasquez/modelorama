@@ -48,8 +48,8 @@ message Example {
 
 All this means:
 
-- GraphQL and Protobuf can be used to validate shape and types on any message being transmitted
-- JSON-Schema can be used to validate format, content and advanced relationships of the data itself
+- GraphQL and Protobuf can be used to validate shape and types on any message being transmitted.
+- JSON-Schema can be used to validate format, content and advanced relationships of the data itself.
 
 > JSON-Schema helps where GraphQL/Protobuf slacks off.
 
