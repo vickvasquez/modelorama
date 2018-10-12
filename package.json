@@ -8,6 +8,11 @@
   "engines": {
     "node": ">= 6"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agave/modelorama"
+  },
+  "bugs": "https://github.com/agave/modelorama/issues",
   "scripts": {
     "start": "node .",
     "watch": "nodemon -e json,yml,proto,gql,js -i '**/_generated/**' .",

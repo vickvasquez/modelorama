@@ -144,7 +144,7 @@ For the application logic and tooling we're using:
 Clone this repo quickly with `degit`:
 
 ```bash
-$ npx degit pateketrueke/modelorama my-project
+$ npx degit agave/modelorama my-project
 $ cd my-project
 $ npm ci
 ```
