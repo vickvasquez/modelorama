@@ -1,16 +1,17 @@
 Modelorama showcases Protobuf, GraphQL and JSON-Schema cooperating to achieve a solid service-based architecture for web applications.
 
-The front-end API is built on GraphQL, communication between back-end services is done with gRPC.
+- The front-end API is built on GraphQL, communication between back-end services is done with gRPC.
+- The database is built on top of Sequelize, also powered by JSON-Schema.
 
-The database is built on top of Sequelize, also powered by JSON-Schema.
+This architecture layout aims to reduce unit-testing at minimum.
 
 # Table of contents
 
 - [How it works?](#how-it-works)
 - [Tools used](#tools-used)
 - [Quick start](#quick-start)
-  - [GraphQL](#graphql)
-  - [Models](#models)
+  - [GraphQL](#graphql) &mdash; front-end API
+  - [Models](#models) &mdash; back-end API
   - [Migrations](#migrations)
 
 ## How it works?
